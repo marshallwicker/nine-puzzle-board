@@ -24,8 +24,6 @@ class NinePuzzleBoard:
         self._tiles = board_str
         self._blank_index = board_str.index(' ')
 
-
-
     def transformable_to(self, other):
         """
         Determine whether this board can be transformed to
@@ -45,16 +43,8 @@ class NinePuzzleBoard:
                  reflects the direction(s) the blank can
                  be moved.
         """
-        return_string = []
-        if self._blank_index % 3 == 0:
-            return_string.append('R')
-        elif self._blank_index % 3 == 1:
-            return_string.append('RD')
-        elif self._blank_index % 3 == 2:
-            return_string.append('L')
 
-
-        return set(NinePuzzleBoard.DIRECTIONS)  # STUB
+        return set(self._MOVES[self._blank_index])
 
     def next_board(self, move):
         """
@@ -64,8 +54,24 @@ class NinePuzzleBoard:
                  in the given direction
         """
         assert move in self.moves(), "Invalid move: " + move
-        # TODO
-        return NinePuzzleBoard(self._tiles)  # STUB
+
+        new_blank = -1
+
+        if move == 'U':
+            new_blank = self._blank_index - 3
+        elif move == 'R':
+            new_blank = self._blank_index + 1
+        elif move == 'D':
+            new_blank = self._blank_index + 3
+        elif move == 'L':
+            new_blank = self._blank_index - 1
+
+        old_tile_list = list(self._tiles)
+
+        old_tile_list[self._blank_index] = old_tile_list[new_blank]
+        old_tile_list[new_blank] = ' '
+
+        return NinePuzzleBoard(board_str=''.join(old_tile_list))  # STUB
 
     def h(self, other):
         """
@@ -83,8 +89,8 @@ class NinePuzzleBoard:
         :return: True iff this board and the other have
                  tiles in the same locations
         """
-        # TODO
-        return self._tiles == '12345678 ' # STUB
+
+        return hash(self) == hash(other)
 
     def __str__(self):
         """
