@@ -25,6 +25,7 @@ class NinePuzzleBoard:
         self._blank_index = board_str.index(' ')
 
 
+
     def transformable_to(self, other):
         """
         Determine whether this board can be transformed to
