@@ -12,6 +12,8 @@ class NinePuzzleBoard:
 
     _TILES = frozenset('12345678 ')  # valid chars in a configuration string
 
+    _MOVES = 'RD|RDL|DL|URD|URDL|UDL|UR|URL|UL'.split('|')
+
     def __init__(self, board_str='12345678-'):
         """
         Initialize a new instance with tiles as given
@@ -21,6 +23,7 @@ class NinePuzzleBoard:
         assert set(board_str) == NinePuzzleBoard._TILES
         self._tiles = board_str
         self._blank_index = board_str.index(' ')
+
 
     def transformable_to(self, other):
         """
@@ -41,7 +44,15 @@ class NinePuzzleBoard:
                  reflects the direction(s) the blank can
                  be moved.
         """
-        # TODO
+        return_string = []
+        if self._blank_index % 3 == 0:
+            return_string.append('R')
+        elif self._blank_index % 3 == 1:
+            return_string.append('RD')
+        elif self._blank_index % 3 == 2:
+            return_string.append('L')
+
+
         return set(NinePuzzleBoard.DIRECTIONS)  # STUB
 
     def next_board(self, move):
