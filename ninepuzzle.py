@@ -14,7 +14,9 @@ class NinePuzzleBoard:
 
     _MOVES = 'RD|RDL|DL|URD|URDL|UDL|UR|URL|UL'.split('|')
 
-    def __init__(self, board_str='12345678-'):
+    _MOVE_TRANSLATIONS = {'U': -3, 'R': 1, 'D': 3, 'L': -1}
+
+    def __init__(self, board_str='12345678 '):
         """
         Initialize a new instance with tiles as given
         :param board_str: a sequence giving the location
@@ -24,17 +26,23 @@ class NinePuzzleBoard:
         self._tiles = board_str
         self._blank_index = board_str.index(' ')
 
-    def transformable_to(self, other):
+    def is_solvable(self):
         """
         Determine whether this board can be transformed to
         another board
-        :param other: another board
         :return: True if this board can be transformed
                  to the other by sliding tiles, False
                  otherwise
         """
-        # TODO
-        return False   # STUB
+
+        inv_count = 0
+        board_list = self.get_board_list()
+
+        for i in range(8):
+            for j in range(i + 1, 9):
+                if i != self._blank_index and j != self._blank_index and board_list[i] > board_list[j]:
+                    inv_count += 1
+        return inv_count % 2 == 0
 
     def moves(self):
         """
@@ -55,23 +63,23 @@ class NinePuzzleBoard:
         """
         assert move in self.moves(), "Invalid move: " + move
 
-        new_blank = -1
-
-        if move == 'U':
-            new_blank = self._blank_index - 3
-        elif move == 'R':
-            new_blank = self._blank_index + 1
-        elif move == 'D':
-            new_blank = self._blank_index + 3
-        elif move == 'L':
-            new_blank = self._blank_index - 1
+        new_blank = self._blank_index + self._MOVE_TRANSLATIONS[move]
 
         old_tile_list = list(self._tiles)
 
         old_tile_list[self._blank_index] = old_tile_list[new_blank]
         old_tile_list[new_blank] = ' '
 
-        return NinePuzzleBoard(board_str=''.join(old_tile_list))  # STUB
+        return NinePuzzleBoard(board_str=''.join(old_tile_list))
+
+    def get_board_list(self):
+        board_list = []
+        for num in range(9):
+            if num != self._blank_index:
+                board_list.append(int(self._tiles[num]))
+            else:
+                board_list.append(-1)
+        return board_list
 
     def h(self, other):
         """
@@ -79,8 +87,16 @@ class NinePuzzleBoard:
         :param other: a NinePuzzleBoard instance
         :return: a number
         """
-        # TODO
-        return 100  # STUB
+        distance = 0
+        for index, number in enumerate(self._tiles):
+            other_board_index = other.get_construct_string().index(number)
+            change_in_x = abs(index % 3 - other_board_index % 3)
+            change_in_y = abs(index // 3 - other_board_index // 3)
+            distance += change_in_x + change_in_y
+        return distance
+
+    def get_construct_string(self):
+        return self._tiles
 
     def __eq__(self, other):
         """
@@ -90,7 +106,7 @@ class NinePuzzleBoard:
                  tiles in the same locations
         """
 
-        return hash(self) == hash(other)
+        return str(self) == str(other)
 
     def __str__(self):
         """
@@ -116,7 +132,7 @@ if __name__ == '__main__':
         print(board2)
         print()
 
-        print("Transformable?", board1.transformable_to(board2))
+        print("Transformable?", board1.is_solvable(board2))
         print()
 
         print('Hashes: ', hash(board1), hash(board2))
